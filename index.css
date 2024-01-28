@@ -1,0 +1,7 @@
+#canvas {
+
+    image-rendering: crisp-edges;
+    border: 1px solid black;
+    height: 360px;
+    width: 640px;
+}
