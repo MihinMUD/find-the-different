@@ -1,62 +1,72 @@
-let imageInputField = document.getElementById("inputImage");
-let generateButton = document.getElementById("generate");
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
-let img = new Image();
+const canvas = document.getElementById("canvas");
+const generateButton = document.getElementById("generate");
+const downloadButton = document.getElementById("download");
 
-generateButton.addEventListener("click", async () => {
-    img.src = URL.createObjectURL(imageInputField.files[0]);
-    // img.addEventListener("load", () => {
-    //     ctx.drawImage(img, 0, 0);
-    // });
-    drawTitle("Title", "#fff", "#0A0", 180);
-    placeImgInGrid(img, 8, 10, 180, 20, 20);
+const imageInputField = document.getElementById("inputImage");
+const diffImageInputField = document.getElementById("diffInputImage");
+
+const titleText = document.getElementById("titleText");
+const titleHeight = document.getElementById("titleHeight");
+const titleColor = document.getElementById("titleColor");
+const titleBgColor = document.getElementById("titleBgColor");
+const bgColor = document.getElementById("bgColor");
+
+const inputFields = document.querySelectorAll(".inputField");
+const imageFields = document.querySelectorAll(".imageField");
+
+const resolutionXField = document.getElementById("resolutionX");
+const resolutionYField = document.getElementById("resolutionY");
+
+const padXField = document.getElementById("padX");
+const padYField = document.getElementById("padY");
+
+const columnsField = document.getElementById("columnsField");
+const rowsField = document.getElementById("rowsField");
+
+let ctx = canvas.getContext("2d");
+
+let img = new Image();
+let diffImg = new Image();
+
+let startGenerating = false;
+
+const reGenerate = () => {
+    if (startGenerating) {
+        canvas.width = resolutionXField.value;
+        canvas.height = resolutionYField.value;
+        ctx = canvas.getContext("2d");
+        ctx.fillStyle = bgColor.value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawTitle(titleText.value, titleColor.value, titleBgColor.value, Number(titleHeight.value));
+        placeImagesInGrid(img, diffImg, Number(rowsField.value), Number(columnsField.value), Number(titleHeight.value), Number(padX.value), Number(padY.value));
+    }
+};
+
+imageFields.forEach((element) => {
+    element.addEventListener("input", async () => {
+        img.src = URL.createObjectURL(imageInputField.files[0]);
+        diffImg.src = URL.createObjectURL(diffImageInputField.files[0]);
+
+        await img.decode();
+        await diffImg.decode();
+
+        reGenerate();
+    });
 });
 
-let placeImgInGrid = async (img, rows, cols, titleHeight, padx, pady) => {
-    // img.src = "https://images.genius.com/e9005e4fca598448862e6dba9eb4370f.1000x1000x1.png";
+inputFields.forEach((element) => {
+    element.addEventListener("input", reGenerate);
+});
 
-    // waits for the image to load.
-    await img.decode();
+generateButton.addEventListener("click", () => {
+    startGenerating = true;
+    reGenerate();
+});
 
-    let placeableWidth = canvas.width - 2 * padx;
-    let placeableHeight = canvas.height - titleHeight - 2 * pady;
-
-    let imgRatio = img.width / img.height;
-
-    // we first assume the width will fit perfectly while the height fits with space left.
-    let newImageWidth = placeableWidth / cols - padx;
-    let newImageHeight = newImageWidth / imgRatio;
-
-    // then we see if height will cut off. if yes we set it the other way around
-    if (newImageHeight > placeableHeight / rows - pady) {
-        newImageHeight = placeableHeight / rows - pady;
-        newImageWidth = newImageHeight * imgRatio;
-    }
-
-    let fullWidth = (newImageWidth + padx) * cols - padx;
-    let fullHeight = (newImageHeight + pady) * rows - pady;
-
-    let placeOffsetX = padx + (placeableWidth - fullWidth) / 2;
-    let placeOffsetY = pady + (placeableHeight - fullHeight) / 2;
-    console.log(placeOffsetY);
-
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            let placePosX = (newImageWidth + padx) * x;
-            let placePosY = (newImageHeight + pady) * y;
-
-            ctx.drawImage(img, placeOffsetX + placePosX, placeOffsetY + titleHeight + placePosY, newImageWidth, newImageHeight);
-        }
-    }
-};
-
-let drawTitle = (title, titleColor, bgColor, bgHeight) => {
-    let fontSize = (bgHeight * 8) / 10;
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, bgHeight);
-    ctx.fillStyle = titleColor;
-    ctx.font = `${fontSize}px sans`;
-    ctx.textAlign = "center";
-    ctx.fillText(title, canvas.width * 0.5, bgHeight - bgHeight / 2 + fontSize / 3);
-};
+downloadButton.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = titleText.value;
+    link.href = canvas.toDataURL();
+    link.click();
+});

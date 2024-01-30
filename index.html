@@ -1,15 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="index.css">
-    <title>Find the different generator</title>
-</head>
-<body>
-    <input type="file" multiple="false" id="inputImage">
-    <canvas id="canvas" width="1920" height="1080"></canvas>
-    <button id="generate">Generate</button>
-    <script src="index.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="index.css" />
+        <title>Find the different generator</title>
+    </head>
+    <body>
+        <div class="hero">
+            <h1>Find the different generator!</h1>
+            <p>Generate find the different puzzles at an ease</p>
+            <div class="wave-divider">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="generator">
+            <canvas id="canvas" width="2048	" height="1152"></canvas>
+            <div class="divider"></div>
+            <div class="config">
+                <label>
+                    Generic image
+                    <input class="imageField" type="file" multiple="false" id="inputImage" />
+                </label>
+                <label>
+                    Different image
+                    <input class="imageField" type="file" multiple="false" id="diffInputImage" />
+                </label>
+                <label>
+                    Grid
+                    <div class="vector-selector">
+                        Columns <input class="inputField" id="columnsField" type="number" value="11" />
+                        Rows <input class="inputField" id="rowsField" type="number" value="6" />
+                    </div>
+                </label>
+                <label>
+                    Title
+                    <input class="inputField" id="titleText" type="text" />
+                </label>
+                <div class="divider"></div>
+                <label>
+                    Resolution
+                    <div class="vector-selector">
+                        <input class="inputField" id="resolutionX" type="number" value="1920" /> x
+                        <input class="inputField" id="resolutionY" type="number" value="1080" />
+                    </div>
+                </label>
+                <label>
+                    Gap
+                    <!-- prettier-ignore -->
+                    <div class="vector-selector">
+                        x: <input class="inputField" id="padX" type="number" value="20" />      
+                        y: <input class="inputField" id="padY" type="number" value="20" />     
+                    </div>
+                </label>
+                <div class="divider"></div>
+
+                <label>
+                    Title Height
+                    <input class="inputField" value="180" id="titleHeight" type="number" />
+                </label>
+                <label>
+                    Title Color
+                    <input class="inputField" value="#ffffff" id="titleColor" type="color" />
+                </label>
+                <label>
+                    Title Background Color
+                    <input class="inputField" id="titleBgColor" type="color" />
+                </label>
+                <label>
+                    Background Color
+                    <input value="#ffffff" class="inputField" id="bgColor" type="color" />
+                </label>
+                <div class="buttons">
+                    <button id="generate">Generate</button>
+                    <button id="download">Download</button>
+                </div>
+            </div>
+        </div>
+        <script src="funcs.js"></script>
+        <script src="index.js"></script>
+    </body>
 </html>
