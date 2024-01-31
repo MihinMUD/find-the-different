@@ -1,53 +1,69 @@
-let placeImagesInGrid = async (normalImage, differentImage, rows, cols, titleHeight, padx, pady) => {
-    // img.src = "https://images.genius.com/e9005e4fca598448862e6dba9eb4370f.1000x1000x1.png";
+let placeImagesInGrid = async (normalImage, differentImage, gridRect, padRect, titleHeight) => {
 
-    let placeableWidth = canvas.width - 2 * padx;
-    let placeableHeight = canvas.height - titleHeight - 2 * pady;
+	let placeableRect = {
+		x:canvas.width - 2 * padRect.x,
+		y:canvas.height - titleHeight - 2 * padRect.y,
 
-    let imgRatio = normalImage.width / normalImage.height;
+	} 
 
-    // we first assume the width will fit perfectly while the height fits with space left.
-    let newImageWidth = placeableWidth / cols - padx;
-    let newImageHeight = newImageWidth / imgRatio;
+	// we first assume the width will fit perfectly while the height fits with space left.
+	let newImageSize = getNewImageRect(normalImage, placeableRect, gridRect, padRect)
 
-    // then we see if height will cut off. if yes we set it the other way around
-    if (newImageHeight > placeableHeight / rows - pady) {
-        newImageHeight = placeableHeight / rows - pady;
-        newImageWidth = newImageHeight * imgRatio;
-    }
+	let allImagesSize = {
+		x: (newImageSize.x + padRect.x) * gridRect.x - padRect.x,
+		y: (newImageSize.y + padRect.y) * gridRect.y - padRect.y
+	}
 
-    let fullWidth = (newImageWidth + padx) * cols - padx;
-    let fullHeight = (newImageHeight + pady) * rows - pady;
+	const placeOffset = {
+		x : Math.round(padRect.x + (placeableRect.x - allImagesSize.x) / 2),
+		y: Math.round(titleHeight + padRect.y + (placeableRect.y - allImagesSize.y) / 2),
+	}
 
-    let placeOffsetX = Math.round(padx + (placeableWidth - fullWidth) / 2);
-    let placeOffsetY = Math.round(titleHeight + pady + (placeableHeight - fullHeight) / 2);
-    let differentImageCoordinates = generateRandomCoordinate(rows, cols);
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            let placePosX = Math.round((newImageWidth + padx) * x);
-            let placePosY = Math.round((newImageHeight + pady) * y);
-            if (x == differentImageCoordinates.x && y == differentImageCoordinates.y) {
-                ctx.drawImage(differentImage, placeOffsetX + placePosX, placeOffsetY + placePosY, newImageWidth, newImageHeight);
-            } else {
-                ctx.drawImage(normalImage, placeOffsetX + placePosX, placeOffsetY + placePosY, newImageWidth, newImageHeight);
-            }
-        }
-    }
+	const differentImageCoordinates = generateRandomCoordinate(gridRect);
+
+	for (let y = 0; y < gridRect.y; y++) {
+		for (let x = 0; x < gridRect.x; x++) {
+			let placePosX = Math.round((newImageSize.x + padRect.x) * x);
+			let placePosY = Math.round((newImageSize.y + padRect.y) * y);
+			if (x == differentImageCoordinates.x && y == differentImageCoordinates.y) {
+				ctx.drawImage(differentImage, placeOffset.x + placePosX, placeOffset.y + placePosY, newImageSize.x, newImageSize.y);
+			} else {
+				ctx.drawImage(normalImage, placeOffset.x + placePosX, placeOffset.y + placePosY, newImageSize.x, newImageSize.y);
+			}
+		}
+	}
 };
 
-let generateRandomCoordinate = (amountOfRows, amountOfCols) => {
-    const x = Math.floor(Math.random() * amountOfCols);
-    const y = Math.floor(Math.random() * amountOfRows);
+let getNewImageRect = (img, placeableRect, gridRect, padRect) => {
+	// gridRect x == amount of columns and y == gridRect.x
+	let imgRatio = img.width / img.height;
+	let size = {
+		x: placeableRect.x / gridRect.x - padRect.x, 
+	}
 
-    return { x, y };
+	size.y = size.x / imgRatio
+
+	if (size.y> placeableRect.y / gridRect.y - padRect.y) {
+		size.y = placeableRect.y / gridRect.y - padRect.y,
+		size.x = size.y * imgRatio
+	}
+	return size
+}
+
+let generateRandomCoordinate = (gridRect) => {
+	return {
+		x: Math.floor(Math.random() * gridRect.x),
+		y: Math.floor(Math.random() * gridRect.y)
+
+	}
 };
 
 let drawTitle = (title, titleColor, bgColor, bgHeight) => {
-    let fontSize = (bgHeight * 8) / 10;
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, bgHeight);
-    ctx.fillStyle = titleColor;
-    ctx.font = `${fontSize}px sans`;
-    ctx.textAlign = "center";
-    ctx.fillText(title, canvas.width * 0.5, bgHeight - bgHeight / 2 + fontSize / 3);
+	let fontSize = (bgHeight * 8) / 10;
+	ctx.fillStyle = bgColor;
+	ctx.fillRect(0, 0, canvas.width, bgHeight);
+	ctx.fillStyle = titleColor;
+	ctx.font = `${fontSize}px sans`;
+	ctx.textAlign = "center";
+	ctx.fillText(title, canvas.width * 0.5, bgHeight - bgHeight / 2 + fontSize / 3);
 };
